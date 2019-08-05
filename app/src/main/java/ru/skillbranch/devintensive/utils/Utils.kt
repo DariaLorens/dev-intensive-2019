@@ -1,7 +1,5 @@
 package ru.skillbranch.devintensive.utils
 
-import java.lang.IllegalStateException
-
 object Utils {
 
     private val transitMap = mapOf(
@@ -49,4 +47,29 @@ object Utils {
         !firstName.isNullOrBlank() && !lastName.isNullOrBlank() -> firstName[0].toUpperCase() + lastName[0].toUpperCase().toString()
         else -> throw IllegalStateException("Incorrect state in 'when' expression")
     }
+
+    fun mathGitHubAccount(adress: String): Boolean = adress.matches(
+        Regex(
+            "^(http(s){0,1}:\\/\\/){0,1}(www.){0,1}github.com\\/[A-z\\d](?:[A-z\\d]|-(?=[A-z\\d])){0,38}\$",
+            RegexOption.IGNORE_CASE
+        )
+    ) &&
+            !adress.matches(
+                Regex(
+                    "^.*(" +
+                            "\\/enterprise|" +
+                            "\\/features|" +
+                            "\\/topics|" +
+                            "\\/collections|" +
+                            "\\/trending|" +
+                            "\\/events|" +
+                            "\\/marketplace" +
+                            "|\\/pricing|" +
+                            "\\/nonprofit|" +
+                            "\\/customer-stories|" +
+                            "\\/security|" +
+                            "\\/login|" +
+                            "\\/join)\$", RegexOption.IGNORE_CASE
+                )
+            )
 }
