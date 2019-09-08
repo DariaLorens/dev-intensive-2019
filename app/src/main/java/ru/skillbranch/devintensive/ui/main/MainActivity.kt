@@ -23,7 +23,7 @@ import ru.skillbranch.devintensive.ui.adapters.ChatItemTouchHelperCallback
 import ru.skillbranch.devintensive.ui.archive.ArchiveActivity
 import ru.skillbranch.devintensive.ui.group.GroupActivity
 import ru.skillbranch.devintensive.utils.Utils
-import ru.skillbranch.devintensive.viewModels.MainViewModel
+import ru.skillbranch.devintensive.viewmodels.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 

@@ -27,7 +27,7 @@ import ru.skillbranch.devintensive.extensions.dp
 import ru.skillbranch.devintensive.models.data.UserItem
 import ru.skillbranch.devintensive.ui.adapters.UserAdapter
 import ru.skillbranch.devintensive.utils.Utils
-import ru.skillbranch.devintensive.viewModels.GroupViewModel
+import ru.skillbranch.devintensive.viewmodels.GroupViewModel
 
 class GroupActivity : AppCompatActivity() {
 

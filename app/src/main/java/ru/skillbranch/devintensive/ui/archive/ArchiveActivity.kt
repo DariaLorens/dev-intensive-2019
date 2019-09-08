@@ -20,7 +20,7 @@ import ru.skillbranch.devintensive.extensions.setTextColor
 import ru.skillbranch.devintensive.ui.adapters.ChatAdapter
 import ru.skillbranch.devintensive.ui.adapters.ChatItemTouchHelperCallback
 import ru.skillbranch.devintensive.utils.Utils
-import ru.skillbranch.devintensive.viewModels.ArchiveViewModel
+import ru.skillbranch.devintensive.viewmodels.ArchiveViewModel
 
 class ArchiveActivity : AppCompatActivity() {
 
