@@ -1,44 +1,34 @@
 package ru.skillbranch.devintensive.viewModels
 
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.skillbranch.devintensive.models.Profile
 import ru.skillbranch.devintensive.repositories.PreferencesRepository
-import ru.skillbranch.devintensive.utils.Utils
 
 class ProfileViewModel : ViewModel() {
-    private val repository = PreferencesRepository
+
+    private val repository: PreferencesRepository = PreferencesRepository
     private val profileData = MutableLiveData<Profile>()
     private val appTheme = MutableLiveData<Int>()
-    private val isRepoError = MutableLiveData<Boolean>()
+    private val isRepoValid = MutableLiveData<Boolean>()
 
     init {
-        Log.d("M_ProfileViewModel", "view_model is initialised")
         profileData.value = repository.getProfile()
         appTheme.value = repository.getAppTheme()
-        onAdressRepositoryChanged(repository.getProfile().repository)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.d("M_ProfileViewModel", "view_model is cleared")
-    }
+    fun isRepoValid(): LiveData<Boolean> = isRepoValid
 
     fun getProfileData(): LiveData<Profile> = profileData
 
     fun saveProfileData(profile: Profile) {
-        if (isRepoError.value ?: false) profile.repository = ""
-        isRepoError.value = true
         repository.saveProfile(profile)
         profileData.value = profile
     }
 
     fun getTheme(): LiveData<Int> = appTheme
-
-    fun isRepoError(): LiveData<Boolean> = isRepoError
 
     fun switchTheme() {
         if (appTheme.value == AppCompatDelegate.MODE_NIGHT_YES) {
@@ -49,7 +39,17 @@ class ProfileViewModel : ViewModel() {
         repository.saveAppTheme(appTheme.value!!)
     }
 
-    fun onAdressRepositoryChanged(repoValue: String) {
-        isRepoError.value = !(Utils.mathGitHubAccount(repoValue) || repoValue.isEmpty())
+    fun repositoryValidation(repository: String) {
+        isRepoValid.value = repository.isEmpty() || repository.matches(
+                Regex("^(https://)?(www.)?(github.com/)(?!(${getRegexExceptions()})(?=/|$))(?![\\W])(?!\\w+[-]{2})[a-zA-Z0-9-]+(?<![-])(/)?$")
+        )
+    }
+
+    private fun getRegexExceptions(): String {
+        val exceptions = arrayOf(
+                "enterprise", "features", "topics", "collections", "trending", "events", "join",
+                "pricing", "nonprofit", "customer-stories", "security", "login", "marketplace"
+        )
+        return exceptions.joinToString("|")
     }
 }

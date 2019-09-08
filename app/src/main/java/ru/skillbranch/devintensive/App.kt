@@ -6,16 +6,17 @@ import androidx.appcompat.app.AppCompatDelegate
 import ru.skillbranch.devintensive.repositories.PreferencesRepository
 
 class App : Application() {
+
     companion object {
-        private var instanse: App? = null
+        private var instance: App? = null
 
         fun applicationContext(): Context {
-            return instanse!!.applicationContext
+            return instance!!.applicationContext
         }
     }
 
     init {
-        instanse = this
+        instance = this
     }
 
     override fun onCreate() {

@@ -24,82 +24,59 @@ fun Date.add(value: Int, units: TimeUnits = TimeUnits.SECOND): Date {
     return this
 }
 
-fun test(){
-
-}
-
 fun Date.humanizeDiff(date: Date = Date()): String {
-    val diff = date.time - this.time
-    val absDiff = abs(diff)
-    val isPast = diff > 0
+    var prefix = ""
+    var postfix = ""
 
-    return when {
-        absDiff / SECOND <= 1 -> "только что"
-        absDiff / SECOND <= 45 -> if (isPast) "несколько секунд назад" else "через несколько секунд"
-        absDiff / SECOND <= 75 -> if (isPast) "минуту назад" else "через минуту"
-        absDiff / MINUTE <= 45 -> if (isPast) "${TimeUnits.MINUTE.plural((absDiff / MINUTE).toInt())} назад" else "через ${TimeUnits.MINUTE.plural((absDiff / MINUTE).toInt())}"
-        absDiff / MINUTE <= 75 -> if (isPast) "час назад" else "через час"
-        absDiff / HOUR <= 22 -> if (isPast) "${TimeUnits.HOUR.plural((absDiff / HOUR).toInt())} назад" else "через ${TimeUnits.HOUR.plural((absDiff / HOUR).toInt())}"
-        absDiff / HOUR <= 26 -> if (isPast) "день назад" else "через день"
-        absDiff / DAY <= 360 -> if (isPast) "${TimeUnits.DAY.plural((absDiff / DAY).toInt())} назад" else "через ${TimeUnits.DAY.plural((absDiff / DAY).toInt())}"
-        else -> if (isPast) "более года назад" else "более чем через год"
+    var diff = date.time - this.time
+
+    if (diff < 0){
+        prefix = "через "
+        diff = -diff
+    } else {
+        postfix = " назад"
+    }
+
+    return when(diff) {
+        in 0..1* TimeUnits.SECOND.value -> "только что"
+        in 1* TimeUnits.SECOND.value..45* TimeUnits.SECOND.value -> "${prefix}несколько секунд$postfix"
+        in 45* TimeUnits.SECOND.value..75* TimeUnits.SECOND.value -> "${prefix}минуту$postfix"
+        in 75* TimeUnits.SECOND.value..45* TimeUnits.MINUTE.value -> "$prefix${TimeUnits.MINUTE.plural(diff/ TimeUnits.MINUTE.value)}$postfix"
+        in 45* TimeUnits.MINUTE.value..75* TimeUnits.MINUTE.value -> "${prefix}час$postfix"
+        in 75* TimeUnits.MINUTE.value..22* TimeUnits.HOUR.value -> "$prefix${TimeUnits.HOUR.plural(diff/ TimeUnits.HOUR.value)}$postfix"
+        in 22* TimeUnits.HOUR.value..26* TimeUnits.HOUR.value -> "${prefix}день$postfix"
+        in 26* TimeUnits.HOUR.value..360* TimeUnits.DAY.value -> "$prefix${TimeUnits.DAY.plural(diff/ TimeUnits.DAY.value)}$postfix"
+        else -> if(date.time - this.time < 0) "более чем через год" else "более года назад"
     }
 }
 
-enum class TimeUnits {
-    SECOND {
-        override fun plural(value: Int): String {
-            val remainder = value % 10
-            var quotient = value / 10
+enum class TimeUnits(val value: Long, private val ONE: String, private val FEW: String, private val MANY: String) {
 
-            while (quotient > 10) quotient /= 10
-            return when {
-                (remainder in 2..4) && (quotient != 1) -> "$value секунды"
-                (remainder == 1) && (quotient != 1) -> "$value секунду"
-                else -> "$value секунд"
-            }
+    SECOND(1000L,"секунду", "секунды", "секунд"),
+    MINUTE(1000L*60L, "минуту", "минуты", "минут"),
+    HOUR(1000L*60L*60L, "час", "часа", "часов"),
+    DAY(1000L*60L*60L*24L, "день", "дня", "дней");
+
+    fun plural(num: Long) : String {
+        return "$num ${this.getAmount(num)}"
+    }
+
+    private fun getAmount(num: Long) : String {
+        return when{
+            num in 5..20L -> MANY
+            num%10  == 1L  -> ONE
+            num%10 in 2..4L  -> FEW
+            else -> MANY
         }
-    },
-    MINUTE {
-        override fun plural(value: Int): String {
-            val remainder = value % 10
-            var quotient = value / 10
-            while (quotient > 10) quotient /= 10
+    }
+}
 
-            return when {
-                (remainder in 2..4) && (quotient != 1) -> "$value минуты"
-                (remainder == 1) && (quotient != 1) -> "$value минуту"
-                else -> "$value минут"
-            }
-        }
-    },
-    HOUR {
-        override fun plural(value: Int): String {
-            val remainder = value % 10
-            var quotient = value / 10
-            while (quotient > 10) quotient /= 10
+fun Date.isSameDay(date: Date) : Boolean {
+    return this.time/ TimeUnits.DAY.value == date.time/ TimeUnits.DAY.value
+}
 
-            return when {
-                (remainder in 2..4) && (quotient != 1) -> "$value часа"
-                (remainder == 1) && (quotient != 1) -> "$value час"
-                else -> "$value часов"
-            }
-        }
-    },
-    DAY {
-        override fun plural(value: Int): String {
-            val remainder = value % 10
-            var quotient = value / 10
-            while (quotient > 10) quotient /= 10
-
-            return when {
-                (remainder in 2..4) && (quotient != 1) -> "$value дня"
-                (remainder == 1) && (quotient != 1) -> "$value день"
-                else -> "$value дней"
-            }
-        }
-
-    };
-
-    abstract fun plural(value: Int): String
+fun Date.shortFormat(): String? {
+    val pattern = if (this.isSameDay(Date())) "HH:mm" else "dd.MM.yy"
+    val dateFormat = SimpleDateFormat(pattern, Locale("ru"))
+    return dateFormat.format(this)
 }
